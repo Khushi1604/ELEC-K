@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fsrt Creator and Spooler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #b0c4de;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            background-color: #e0e7ff;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .header button {
+            align-self: flex-start;
+            margin-bottom: 10px;
+        }
+        .header .field-group {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .header .field-group label {
+            width: 150px;
+            margin-right: 10px;
+        }
+        .header .field-group input, .header .field-group textarea {
+            width: 50%;
+            padding: 8px;
+        }
+        .swr-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .swr-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .swr-group h3 {
+            margin-top: 0;
+        }
+        .swr-group textarea {
+            padding: 8px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .spool-btn {
+            align-self: flex-end;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+        }
+        .spool-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <button onclick="createNew()">New</button>
+        <div class="field-group">
+            <label for="lot">Lot:</label>
+            <input type="text" id="lot" placeholder="Enter Lot Number">
+        </div>
+        <div class="field-group">
+            <label for="deviceType">Device Type:</label>
+            <input type="text" id="deviceType" placeholder="Enter Device Type">
+        </div>
+        <div class="field-group">
+            <label for="deviceConfig">Device Configuration:</label>
+            <input type="text" id="deviceConfig" placeholder="Enter Device Configuration">
+        </div>
+        <div class="field-group">
+            <label for="comment">Comment:</label>
+            <textarea id="comment" rows="2" placeholder="Enter your comment"></textarea>
+        </div>
+    </div>
+
+    <div id="swrContainer" class="swr-container">
+    
+    </div>
+
+    <button class="spool-btn" onclick="spoolData()">Spool</button>
+</div>
+
+<script>
+    let swrGroupCount = 1;
+
+    // Function to create a new page
+    function createNew() {
+        document.getElementById("lot").value = "";
+        document.getElementById("deviceType").value = "";
+        document.getElementById("deviceConfig").value = "";
+        document.getElementById("comment").value = "";
+        document.getElementById("swrContainer").innerHTML = "";
+        swrGroupCount = 1;
+        createSWRGroup(swrGroupCount);
+    }
+
+    // Function to create a new SWR group
+    function createSWRGroup(groupNumber) {
+        const swrContainer = document.getElementById("swrContainer");
+
+        const swrGroup = document.createElement("div");
+        swrGroup.className = "swr-group";
+        swrGroup.id = `swrGroup${groupNumber}`;
+
+        swrGroup.innerHTML = `
+            <h3>SWR Group ${groupNumber}</h3>
+            <textarea id="fidList${groupNumber}" rows="4" placeholder="Enter FID list here"></textarea>
+            <div class="buttons">
+                <button onclick="addSWRGroup()">+</button>
+                <button onclick="removeSWRGroup(${groupNumber})">-</button>
+            </div>
+        `;
+
+        swrContainer.appendChild(swrGroup);
+    }
+
+    // Add a new SWR group up to a maximum of 20
+    function addSWRGroup() {
+        if (swrGroupCount < 20) {
+            swrGroupCount++;
+            createSWRGroup(swrGroupCount);
+        } else {
+            alert("Maximum of 20 SWR groups reached.");
+        }
+    }
+
+    // Remove an SWR group
+    function removeSWRGroup(groupNumber) {
+        if (swrGroupCount > 1) {
+            const swrGroup = document.getElementById(`swrGroup${groupNumber}`);
+            if (swrGroup) {
+                swrGroup.remove();
+                swrGroupCount--;
+            }
+        } else {
+            alert("At least one SWR group must remain.");
+        }
+    }
+
+    // Spool function to send data to the backend and trigger Python script
+    function spoolData() {
+        const lot = document.getElementById("lot").value;
+        const deviceType = document.getElementById("deviceType").value;
+        const deviceConfig = document.getElementById("deviceConfig").value;
+        const comment = document.getElementById("comment").value;
+
+        let swrGroups = [];
+        for (let i = 1; i <= swrGroupCount; i++) {
+            const fidList = document.getElementById(`fidList${i}`).value;
+            swrGroups.push({
+                groupNumber: i,
+                fidList: fidList
+            });
+        }
+
+        const data = {
+            lot,
+            deviceType,
+            deviceConfig,
+            comment,
+            swrGroups
+        };
+
+        // Simulated AJAX call to send data to the backend
+        fetch('/your-backend-endpoint', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Instruction file created successfully!');
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Call createNew on load to initialize one SWR group
+    window.onload = createNew;
+</script>
+
+</body>
+</html>
+
