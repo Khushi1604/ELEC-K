@@ -1,18 +1,18 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fsrt Creator and Spooler</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=note_add" />
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #b0c4de;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
         }
@@ -25,15 +25,28 @@
             flex-direction: column;
             align-items: flex-start;
         }
-        .header {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
+        .project-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
             margin-bottom: 20px;
+        }
+        .footer-email {
+            font-size: 26px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
         }
         .header button {
             align-self: flex-start;
             margin-bottom: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .header button span {
+            font-size: 18px; /* Small text for "New" button */
         }
         .header .field-group {
             display: flex;
@@ -73,7 +86,6 @@
             margin-top: 10px;
         }
         button {
-            padding: 10px;
             cursor: pointer;
         }
         .spool-btn {
@@ -81,19 +93,34 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 12px;
             border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .spool-btn:hover {
             background-color: #45a049;
         }
+        .spool-btn svg {
+            width: 32px; /* Increased width for larger icon */
+            height: 32px; /* Increased height for larger icon */
+            fill: white; /* Icon color */
+        }
+         
     </style>
 </head>
 <body>
 
+<div class="project-title">FSRT FGen Tool</div>
+
 <div class="container">
     <div class="header">
-        <button onclick="createNew()">New</button>
+        <button onclick="createNew()">
+            <span class="material-symbols-outlined">note_add</span>
+            New
+        </button>
         <div class="field-group">
             <label for="lot">Lot:</label>
             <input type="text" id="lot" placeholder="Enter Lot Number">
@@ -113,16 +140,21 @@
     </div>
 
     <div id="swrContainer" class="swr-container">
-    
     </div>
 
-    <button class="spool-btn" onclick="spoolData()">Spool</button>
+    <button class="spool-btn" onclick="spoolData()">
+        <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#ffffff">
+            <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
+        </svg>
+        <h3 class="add">Spool</h3>
+    </button>
 </div>
+
+<div class="footer-email">abc@gmail.com</div>
 
 <script>
     let swrGroupCount = 1;
 
-    // Function to create a new page
     function createNew() {
         document.getElementById("lot").value = "";
         document.getElementById("deviceType").value = "";
@@ -133,7 +165,6 @@
         createSWRGroup(swrGroupCount);
     }
 
-    // Function to create a new SWR group
     function createSWRGroup(groupNumber) {
         const swrContainer = document.getElementById("swrContainer");
 
@@ -153,7 +184,6 @@
         swrContainer.appendChild(swrGroup);
     }
 
-    // Add a new SWR group up to a maximum of 20
     function addSWRGroup() {
         if (swrGroupCount < 20) {
             swrGroupCount++;
@@ -163,7 +193,6 @@
         }
     }
 
-    // Remove an SWR group
     function removeSWRGroup(groupNumber) {
         if (swrGroupCount > 1) {
             const swrGroup = document.getElementById(`swrGroup${groupNumber}`);
@@ -176,7 +205,6 @@
         }
     }
 
-    // Spool function to send data to the backend and trigger Python script
     function spoolData() {
         const lot = document.getElementById("lot").value;
         const deviceType = document.getElementById("deviceType").value;
@@ -200,7 +228,6 @@
             swrGroups
         };
 
-        // Simulated AJAX call to send data to the backend
         fetch('/your-backend-endpoint', {
             method: 'POST',
             headers: {
@@ -218,10 +245,8 @@
         });
     }
 
-    // Call createNew on load to initialize one SWR group
     window.onload = createNew;
 </script>
 
 </body>
 </html>
-
