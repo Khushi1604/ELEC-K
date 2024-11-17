@@ -13,7 +13,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: auto;
             margin: 0;
         }
         .container {
@@ -26,10 +26,30 @@
             align-items: flex-start;
         }
         .project-title {
+            margin-top: 3rem;
             font-size: 24px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
+        }
+        .flex{
+            display: flex;
+        }
+        .w-96{
+            width: 97%;
+        }
+        .gap-20{
+            gap: 5rem;
+        }
+        .mt-10{
+            margin-top: 2rem;
+        }
+        .items-center{
+            align-items: center;
+        }
+        .logo{
+            font-size: 1.5rem;
+            padding-bottom: 0.5rem;
         }
         .footer-email {
             font-size: 26px;
@@ -62,28 +82,34 @@
             padding: 8px;
         }
         .swr-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        width: 100%; 
+        margin-top: 20px; 
         }
         .swr-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #d3d3d3;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .swr-group h3 {
-            margin-top: 0;
+        margin: 0 0 10px;
+        font-size: 18px;
+        text-align: center;
         }
         .swr-group textarea {
-            padding: 8px;
-            width: 100%;
-            margin-top: 10px;
+        padding: 8px;
+        width: 100%;
+        resize: none;
+        margin-bottom: 10px;
+        box-sizing: border-box;
         }
         .buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
         }
         button {
             cursor: pointer;
@@ -104,10 +130,21 @@
             background-color: #45a049;
         }
         .spool-btn svg {
-            width: 32px; /* Increased width for larger icon */
-            height: 32px; /* Increased height for larger icon */
-            fill: white; /* Icon color */
+            width: 32px;
+            height: 32px; 
+            fill: white; 
         }
+        .checkbox-container {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-container label {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
          
     </style>
 </head>
@@ -116,33 +153,47 @@
 <div class="project-title">FSRT FGen Tool</div>
 
 <div class="container">
+    
     <div class="header">
+       <div class="flex gap-20 items-center">
+        <div class="logo">MICRON</div>
         <button onclick="createNew()">
             <span class="material-symbols-outlined">note_add</span>
             New
         </button>
-        <div class="field-group">
-            <label for="lot">Lot:</label>
-            <input type="text" id="lot" placeholder="Enter Lot Number">
+       </div>
+        <div class="flex gap-20">
+            <div class="field-group">
+                <label for="lot">Lot:</label>
+                <input type="text" id="lot" placeholder="Enter Lot Number">
+            </div>
+            <div class="field-group">
+                <label for="deviceType">Device Type:</label>
+                <input type="text" id="deviceType" placeholder="Enter Device Type">
+            </div>
         </div>
-        <div class="field-group">
-            <label for="deviceType">Device Type:</label>
-            <input type="text" id="deviceType" placeholder="Enter Device Type">
-        </div>
-        <div class="field-group">
-            <label for="deviceConfig">Device Configuration:</label>
-            <input type="text" id="deviceConfig" placeholder="Enter Device Configuration">
-        </div>
-        <div class="field-group">
-            <label for="comment">Comment:</label>
-            <textarea id="comment" rows="2" placeholder="Enter your comment"></textarea>
+        <div class="flex gap-20">
+            <div class="field-group">
+                <label for="deviceConfig">Device Configuration:</label>
+                <input type="text" id="deviceConfig" placeholder="Enter Device Configuration">
+            </div>
+            <div class="field-group">
+                <label for="comment">Comment:</label>
+                <textarea id="comment" rows="2" placeholder="Enter your comment"></textarea>
+            </div>
+            <div class="field-group checkbox-container">
+                <label>
+                    <input type="checkbox" id="allCheckbox">
+                    All
+                </label>
+            </div>
         </div>
     </div>
 
-    <div id="swrContainer" class="swr-container">
+        <div id="swrContainer" class="swr-container">
     </div>
 
-    <button class="spool-btn" onclick="spoolData()">
+    <button class="spool-btn mt-10" onclick="spoolData()">
         <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#ffffff">
             <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
         </svg>
@@ -155,86 +206,167 @@
 <script>
     let swrGroupCount = 1;
 
-    function createNew() {
-        document.getElementById("lot").value = "";
-        document.getElementById("deviceType").value = "";
-        document.getElementById("deviceConfig").value = "";
-        document.getElementById("comment").value = "";
-        document.getElementById("swrContainer").innerHTML = "";
-        swrGroupCount = 1;
-        createSWRGroup(swrGroupCount);
-    }
+    document.getElementById("comment").addEventListener("input", function () {
+    const allCheckbox = document.getElementById("allCheckbox");
+    const swrGroups = document.querySelectorAll(".swr-group textarea[id^='comment']");
 
-    function createSWRGroup(groupNumber) {
-        const swrContainer = document.getElementById("swrContainer");
+    // Check or uncheck the checkbox based on input value
+    allCheckbox.checked = this.value.trim() !== "";
 
-        const swrGroup = document.createElement("div");
-        swrGroup.className = "swr-group";
-        swrGroup.id = `swrGroup${groupNumber}`;
+    // Update all SWR group comments and hide them
+    swrGroups.forEach(commentArea => {
+        commentArea.value = this.value; // Sync value
+        toggleSWRCommentsVisibility(allCheckbox.checked); // Hide or show
+    });
+});
 
-        swrGroup.innerHTML = `
-            <h3>SWR Group ${groupNumber}</h3>
-            <textarea id="fidList${groupNumber}" rows="4" placeholder="Enter FID list here"></textarea>
-            <div class="buttons">
-                <button onclick="addSWRGroup()">+</button>
-                <button onclick="removeSWRGroup(${groupNumber})">-</button>
-            </div>
-        `;
+document.getElementById("allCheckbox").addEventListener("change", function () {
+    toggleSWRCommentsVisibility(this.checked);
+});
 
-        swrContainer.appendChild(swrGroup);
-    }
+// Function to hide or show SWR group comment fields based on checkbox state
+function toggleSWRCommentsVisibility(shouldHide) {
+    const swrGroups = document.querySelectorAll(".swr-group textarea[id^='comment']");
+    swrGroups.forEach(commentArea => {
+        commentArea.style.display = shouldHide ? "none" : "block"; // Toggle visibility
+    });
+}
 
-    function addSWRGroup() {
-        if (swrGroupCount < 20) {
-            swrGroupCount++;
-            createSWRGroup(swrGroupCount);
-        } else {
-            alert("Maximum of 20 SWR groups reached.");
+function createNew() {
+    document.getElementById("lot").value = "";
+    document.getElementById("deviceType").value = "";
+    document.getElementById("deviceConfig").value = "";
+    document.getElementById("comment").value = "";
+    document.getElementById("swrContainer").innerHTML = "";
+    swrGroupCount = 1;
+    createSWRGroup(swrGroupCount);
+    toggleSWRCommentsVisibility(false); // Ensure fields are visible by default
+}
+
+function createSWRGroup(groupNumber) {
+    const swrContainer = document.getElementById("swrContainer");
+
+    const swrGroup = document.createElement("div");
+    swrGroup.className = "swr-group";
+    swrGroup.id = swrGroup${groupNumber};
+
+    swrGroup.innerHTML = `
+        <h3>SWR Group ${groupNumber}</h3>
+        <div id="fidListContainer${groupNumber}" class="fid-list-container">
+            <input type="text" id="fidInput${groupNumber}" placeholder="Enter FID and press Enter" class="w-96" >
+            <ul id="fidListDisplay${groupNumber}"></ul>
+        </div>
+        <textarea id="comment${groupNumber}" rows="2" placeholder="Enter the Comment"></textarea>
+        <div class="buttons">
+            <button onclick="addSWRGroup()">+</button>
+            <button onclick="removeSWRGroup(${groupNumber})">-</button>
+        </div>
+    `;
+
+    swrContainer.appendChild(swrGroup);
+
+    // Add event listener for the input field to handle Enter key
+    const fidInput = document.getElementById(fidInput${groupNumber});
+    fidInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission
+            addFIDToList(groupNumber);
         }
-    }
+    });
+}
 
-    function removeSWRGroup(groupNumber) {
-        if (swrGroupCount > 1) {
-            const swrGroup = document.getElementById(`swrGroup${groupNumber}`);
-            if (swrGroup) {
-                swrGroup.remove();
-                swrGroupCount--;
-            }
-        } else {
-            alert("At least one SWR group must remain.");
-        }
-    }
+function addFIDToList(groupNumber) {
+    const fidInput = document.getElementById(fidInput${groupNumber});
+    const fidListDisplay = document.getElementById(fidListDisplay${groupNumber});
 
-    function spoolData() {
-        const lot = document.getElementById("lot").value;
-        const deviceType = document.getElementById("deviceType").value;
-        const deviceConfig = document.getElementById("deviceConfig").value;
-        const comment = document.getElementById("comment").value;
+    const fidValue = fidInput.value.trim();
+    if (fidValue) {
+        const li = document.createElement("li");
+        li.textContent = fidValue;
 
-        let swrGroups = [];
-        for (let i = 1; i <= swrGroupCount; i++) {
-            const fidList = document.getElementById(`fidList${i}`).value;
-            swrGroups.push({
-                groupNumber: i,
-                fidList: fidList
-            });
-        }
-
-        const data = {
-            lot,
-            deviceType,
-            deviceConfig,
-            comment,
-            swrGroups
+        // Add a delete button for each list item
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "X";
+        deleteButton.style.marginLeft = "10px";
+        deleteButton.style.cursor = "pointer";
+        deleteButton.onclick = function () {
+            li.remove();
         };
 
-        fetch('/your-backend-endpoint', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
+        li.appendChild(deleteButton);
+        fidListDisplay.appendChild(li);
+
+        fidInput.value = ""; // Clear the input field
+    }
+}
+
+function addSWRGroup() {
+    if (swrGroupCount < 20) {
+        swrGroupCount++;
+        createSWRGroup(swrGroupCount);
+    } else {
+        alert("Maximum of 20 SWR groups reached.");
+    }
+}
+
+function removeSWRGroup(groupNumber) {
+    if (swrGroupCount > 1) {
+        const swrGroup = document.getElementById(swrGroup${groupNumber});
+        if (swrGroup) {
+            swrGroup.remove();
+            swrGroupCount--;
+            renumberSWRGroups();
+        }
+    } else {
+        alert("At least one SWR group must remain.");
+    }
+}
+
+function renumberSWRGroups() {
+    const swrGroups = document.querySelectorAll(".swr-group");
+    swrGroups.forEach((group, index) => {
+        const newGroupNumber = index + 1; // Renumber sequentially starting from 1
+        group.id = swrGroup${newGroupNumber};
+        group.querySelector("h3").textContent = SWR Group ${newGroupNumber};
+        group.querySelector("textarea").id = fidList${newGroupNumber};
+        const removeButton = group.querySelector(".buttons button:nth-child(2)");
+        removeButton.setAttribute("onclick", removeSWRGroup(${newGroupNumber}));
+    });
+}
+
+function spoolData() {
+    const lot = document.getElementById("lot").value;
+    const deviceType = document.getElementById("deviceType").value;
+    const deviceConfig = document.getElementById("deviceConfig").value;
+    const comment = document.getElementById("comment").value;
+
+    let swrGroups = [];
+    for (let i = 1; i <= swrGroupCount; i++) {
+        const fidListDisplay = document.getElementById(fidListDisplay${i});
+        const fidItems = Array.from(fidListDisplay.querySelectorAll("li")).map(li => li.textContent.replace("X", "").trim());
+        const comment = document.getElementById(comment${i}).value;
+        swrGroups.push({
+            groupNumber: i,
+            fidList: fidItems,
+            fidListComment: comment
+        });
+    }
+
+    const data = {
+        lot,
+        deviceType,
+        deviceConfig,
+        comment,
+        swrGroups
+    };
+
+    fetch('/your-backend-endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
         .then(response => response.json())
         .then(data => {
             alert('Instruction file created successfully!');
@@ -243,9 +375,12 @@
         .catch((error) => {
             console.error('Error:', error);
         });
-    }
+    console.log(data);
+} 
 
-    window.onload = createNew;
+
+window.onload = createNew;
+
 </script>
 
 </body>
