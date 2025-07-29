@@ -385,3 +385,129 @@ window.onload = createNew;
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FMEA Compliance Check</title>
+ <script src="js/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e1f5fe);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: Black;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    input[type="file"] {
+      margin: 20px 0;
+      padding: 10px;
+      border: 2px dashed black;
+      border-radius: 8px;
+      background-color: #f1f8e9;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color:black;
+    }
+
+    #result {
+      margin-top: 25px;
+      background:white;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      color: black;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Upload Excel File</h2>
+    <input type="file" id="fileInput" accept=".xlsx" />
+    <br />
+    <button onclick="analyze()">Analyze</button>
+    <div id="result"></div>
+  </div>
+
+  
+<script>
+    function analyze() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) {
+        alert("Please upload an Excel file");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        const afIndex = 31;
+        let total = 0, filled = 0;
+
+        rows.forEach(row => {
+          if (row.length > afIndex) {
+            total++;
+            const cell = row[afIndex];
+            if (cell !== undefined && cell !== null && cell.toString().trim() !== "") {
+              filled++;
+            }
+          }
+        });
+
+        const percent = total > 0 ? ((filled / total) * 100).toFixed(2) : 0;
+
+        document.getElementById('result').innerHTML = `
+          <p><strong>Total Cells in Column AF:</strong> ${total}</p>
+          <p><strong>Filled Cells:</strong> ${filled}</p>
+          <p><strong>Percentage Filled:</strong> ${percent}%</p>
+        `;
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
+</html>
+
